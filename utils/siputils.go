@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/packetresearch/sipbrute/models"
+	"github.com/packetassailant/sipbrute/models"
 )
 
 // UtilMarshaller wraps class to protect global namespace
@@ -85,10 +85,10 @@ func (um *UtilMarshaller) CrackHash(s *models.SIPStruct, dict string, verbose bo
 	if err := dictScanner.Err(); err != nil {
 		return "", err
 	}
+
 	fmt.Printf("Starting crack of hash: %s\n", s.Response)
 	for dictScanner.Scan() {
-		passBuf := string(dictScanner.Text())
-		passwd := strings.TrimSpace(passBuf)
+		passwd := strings.TrimSpace(dictScanner.Text())
 
 		ha1 := getMD5Hash(s.Username + ":" + s.Realm + ":" + passwd)
 		ha2 := getMD5Hash(s.Method + ":" + s.URI)
@@ -106,6 +106,7 @@ func (um *UtilMarshaller) CrackHash(s *models.SIPStruct, dict string, verbose bo
 			break
 		}
 	}
+
 	return crackStatus, nil
 }
 
