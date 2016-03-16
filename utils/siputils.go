@@ -98,11 +98,11 @@ func (um *UtilMarshaller) CrackHash(s *models.SIPStruct, dict string, verbose bo
 	// This can happen if there are two matching passwords in a list.
 	lk := sync.RWMutex{}
 
+	ha2 := getMD5Hash(s.Method + ":" + s.URI)
 	for i := 0; i < workercount; i++ {
-		go func(s *models.SIPStruct) {
+		go func(s *models.SIPStruct, ha2 string) {
 			for passwd := range passwds {
 				ha1 := getMD5Hash(s.Username + ":" + s.Realm + ":" + passwd)
-				ha2 := getMD5Hash(s.Method + ":" + s.URI)
 				ha3 := getMD5Hash(ha1 + ":" + s.Nonce + ":" + ha2)
 
 				if verbose {
@@ -123,7 +123,7 @@ func (um *UtilMarshaller) CrackHash(s *models.SIPStruct, dict string, verbose bo
 				}
 				wg.Done()
 			}
-		}(s)
+		}(s, ha2)
 	}
 
 	for dictScanner.Scan() {
