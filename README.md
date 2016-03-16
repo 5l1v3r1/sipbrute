@@ -37,7 +37,7 @@ Max-Forwards: 70
 CSeq: 102 REGISTER
 User-Agent: Cisco-CP7960G/8.0
 Contact: <sip:100@192.168.1.118:5061;user=phone;transport=udp>;+sip.instance="<urn:uuid:00000000-0000-0000-0000-001200a65ed2>";+u.sip!model.ccm.cisco.com="7"
-Authorization: Digest **username="100"**,**realm="asterisk"**,**uri="sip:192.168.1.10**",response="c692e989178c5cdca7dc577abfa467d2",**nonce="4914d427"**,algorithm=MD5
+Authorization: Digest username="100",realm="asterisk",uri="sip:192.168.1.10",response="c692e989178c5cdca7dc577abfa467d2",nonce="4914d427",algorithm=MD5
 Content-Length: 0
 Expires: 3600
 ```
@@ -63,7 +63,7 @@ Git clone this repo (git clone https://github.com/packetassailant/sipbrute.git)
 cd into the repo and type go build (you will now have a **sipbrute** binary)
 ```
 
-## Sample Run - CSV Output
+## Sample Run - Concurrency using an i7 proc
 ```
 $ time ./sipbrute -path samples/register.txt -dict 384000wordlist.txt
 Starting crack of hash: c692e989178c5cdca7dc577abfa467d2
