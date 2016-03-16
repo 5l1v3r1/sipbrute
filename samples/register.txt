@@ -1,0 +1,12 @@
+REGISTER sip:192.168.1.10 SIP/2.0
+Via: SIP/2.0/UDP 192.168.1.118:5061;branch=z9hG4bK5f0808d1
+From: <sip:100@192.168.1.10>;tag=001200a65ed20002553c39ec-1fe32660
+To: <sip:100@192.168.1.10>
+Call-ID: 001200a6-5ed20002-1b3eb454-1f3bd705@192.168.1.118
+Max-Forwards: 70
+CSeq: 102 REGISTER
+User-Agent: Cisco-CP7960G/8.0
+Contact: <sip:100@192.168.1.118:5061;user=phone;transport=udp>;+sip.instance="<urn:uuid:00000000-0000-0000-0000-001200a65ed2>";+u.sip!model.ccm.cisco.com="7"
+Authorization: Digest username="100",realm="asterisk",uri="sip:192.168.1.10",response="c692e989178c5cdca7dc577abfa467d2",nonce="4914d427",algorithm=MD5
+Content-Length: 0
+Expires: 3600
