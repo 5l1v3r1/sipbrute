@@ -8,16 +8,16 @@ A utility to perform dictionary attacks against the VoIP SIP Register hash (MD5)
 ## Handshake w/ Authentication
 ```
 Step 1. The User Agent Client (UAC) initiates a request to Register with the User Agent Server (UAS)
-Step 2. The UAS responds with a 401 including a **WWW-Authenticate** header
-Step 3. The UAC responds with another Register request including an **Authorization** header
+Step 2. The UAS responds with a 401 including a WWW-Authenticate header
+Step 3. The UAC responds with another Register request including an Authorization header
 Step 4. The UAS authenticates the UAC and passes a 200 response
 ```
 
 ## Vulnerability
 ```
 Using the following UAC response (Step 3), we can deduce a few items of relevance. Specifically,
-via RFC 3261 we know that the _username_, _realm_, _uri_, and _nonce_ are all used through a series
-of MD5 hash operations in order to create the value contained with the _response_ attribute.
+via RFC 3261 we know that the USERNAME, REALM, URI, and NONCE are all used through a series
+of MD5 hash operations in order to create the value contained with the RESPONSE attribute.
 
 The hash chain follows:
 H1 = username + ":" + realm + ":" + passphrase
@@ -60,7 +60,7 @@ Installation
 ---------------------------------------------------
 Install GO (tested on 1.5.2)
 Git clone this repo (git clone https://github.com/packetassailant/sipbrute.git)
-cd into the repo and type go build (you will now have a **sipbrute** binary)
+cd into the repo and type go build (you will now have a sipbrute binary)
 ```
 
 ## Sample Run - Concurrency using an i7 proc
