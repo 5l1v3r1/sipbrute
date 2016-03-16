@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/packetresearch/sipbrute/models"
-	"github.com/packetresearch/sipbrute/utils"
+	"github.com/packetassailant/sipbrute/models"
+	"github.com/packetassailant/sipbrute/utils"
 )
 
 func main() {
-	work := flag.Int("work", 100, "the number of go routines (default: 100)")
 	path := flag.String("path", "", "the SIP register UAC response file")
 	dict := flag.String("dict", "", "the dictionary wordlist")
 	verbose := flag.Bool("verbose", false, "stdout every derivation attempt")
@@ -25,8 +24,6 @@ func main() {
 	}
 
 	um := utils.UtilMarshaller{}
-
-	fmt.Println(*work)
 
 	result, err := um.ParseResponse(*path)
 	if err != nil {

@@ -6,9 +6,11 @@ import (
 	"encoding/hex"
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
+	"sync"
 
-	"github.com/packetresearch/sipbrute/models"
+	"github.com/packetassailant/sipbrute/models"
 )
 
 // UtilMarshaller wraps class to protect global namespace
@@ -85,27 +87,62 @@ func (um *UtilMarshaller) CrackHash(s *models.SIPStruct, dict string, verbose bo
 	if err := dictScanner.Err(); err != nil {
 		return "", err
 	}
+
 	fmt.Printf("Starting crack of hash: %s\n", s.Response)
-	for dictScanner.Scan() {
-		passBuf := string(dictScanner.Text())
-		passwd := strings.TrimSpace(passBuf)
 
-		ha1 := getMD5Hash(s.Username + ":" + s.Realm + ":" + passwd)
-		ha2 := getMD5Hash(s.Method + ":" + s.URI)
-		ha3 := getMD5Hash(ha1 + ":" + s.Nonce + ":" + ha2)
+	workercount := runtime.NumCPU()
+	passwds := make(chan string, workercount)
+	isClosed := false
+	wg := &sync.WaitGroup{}
+	// This lock is needed to ensure we don't close a closed channel.
+	// This can happen if there are two matching passwords in a list.
+	lk := sync.RWMutex{}
 
-		if verbose {
-			fmt.Printf("Attempting hash crack: %s\n", passwd)
-			fmt.Printf("Created hash format ha1: %s\n", ha1)
-			fmt.Printf("Created hash format ha2: %s\n", ha2)
-			fmt.Printf("Created hash format ha3: %s\n", ha3)
-		}
+	for i := 0; i < workercount; i++ {
+		go func(s *models.SIPStruct) {
+			for passwd := range passwds {
+				ha1 := getMD5Hash(s.Username + ":" + s.Realm + ":" + passwd)
+				ha2 := getMD5Hash(s.Method + ":" + s.URI)
+				ha3 := getMD5Hash(ha1 + ":" + s.Nonce + ":" + ha2)
 
-		if ha3 == s.Response {
-			crackStatus = fmt.Sprintf("Password match: %s on hash %s", passwd, ha3)
-			break
-		}
+				if verbose {
+					fmt.Printf("Attempting hash crack: %s\n", passwd)
+					fmt.Printf("Created hash format ha1: %s\n", ha1)
+					fmt.Printf("Created hash format ha2: %s\n", ha2)
+					fmt.Printf("Created hash format ha3: %s\n", ha3)
+				}
+
+				if ha3 == s.Response {
+					lk.Lock()
+					crackStatus = fmt.Sprintf("Password match: %s on hash %s", passwd, ha3)
+					if !isClosed {
+						isClosed = true
+						close(passwds)
+					}
+					lk.Unlock()
+				}
+				wg.Done()
+			}
+		}(s)
 	}
+
+	for dictScanner.Scan() {
+		lk.RLock()
+		if !isClosed {
+			wg.Add(1)
+			passwds <- strings.TrimSpace(dictScanner.Text())
+		}
+		lk.RUnlock()
+	}
+
+	wg.Wait()
+
+	lk.Lock()
+	if !isClosed {
+		close(passwds)
+	}
+	lk.Unlock()
+
 	return crackStatus, nil
 }
 
