@@ -53,5 +53,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Print(crackResult)
+	fmt.Println(crackResult)
 }
